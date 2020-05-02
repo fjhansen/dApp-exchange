@@ -1,14 +1,9 @@
+import { tokens } from './helpers'
 const Token = artifacts.require('./Token')
 
 require('chai')
 .use(require('chai-as-promised'))
 .should()
-
-const tokens = (n) => {
-  return new web3.utils.BN(
-    web3.utils.toWei(n.toString(), 'ether')
-  )
-}
 
 contract('Token', ([deployer, receiver]) => {
   const name = 'Juniper'
@@ -56,8 +51,10 @@ contract('Token', ([deployer, receiver]) => {
       await token.transfer(receiver, tokens(100), {from: deployer})
 
       balanceOf = await token.balanceOf(deployer);
+      balanceOf.toString().should.equal(tokens(999900).toString())
       console.log("deployer balance after transfer", balanceOf.toString());
       balanceOf = await token.balanceOf(receiver);
+      balanceOf.toString().should.equal(tokens(100).toString())
       console.log("receiver balance after transfer", balanceOf.toString())
 
     })
