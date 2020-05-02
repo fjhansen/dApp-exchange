@@ -4,7 +4,7 @@ require('chai')
 .use(require('chai-as-promised'))
 .should()
 
-contract('Token', (accounts) => {
+contract('Token', ([deployer]) => {
   const name = 'Juniper'
   const symbol = 'JUNI'
   const decimals = '18'
@@ -31,5 +31,11 @@ contract('Token', (accounts) => {
       const result = await token.totalSupply()
       result.toString().should.equal(totalSupply)
     })
+
+    it('tracks the total supply', async () => {
+      const result = await token.balanceOf(deployer)
+      result.toString().should.equal(totalSupply)
+    })
+    
   })
 })
