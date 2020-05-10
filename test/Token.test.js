@@ -1,4 +1,4 @@
-import { tokens } from './helpers'
+import { tokens, EVM_REVERT } from './helpers'
 const Token = artifacts.require('./Token')
 
 require('chai')
@@ -44,6 +44,8 @@ contract('Token', ([deployer, receiver]) => {
     
       let result
       let amount
+
+      describe('success', async () => {
       beforeEach(async () => {
         amount = tokens(100)
         result = await token.transfer(receiver, amount, {from: deployer})
@@ -64,7 +66,24 @@ contract('Token', ([deployer, receiver]) => {
       event.from.toString().should.equal(deployer, 'FROM is correct')
       event.to.should.equal(receiver, 'TO is correct')
       event.value.toString().should.equal(amount.toString(), 'VALUE is correct')
-    })    
+    })            
+      })
+      describe('failure', async () => {
+
+      it('rejects insufficient balances', async () => {
+        let invalidAmount
+        invalidAmount = tokens(100000000) // 100 mil - greater than total supply
+        await token.transfer(receiver, invalidAmount, { from: deployer}).should.be.rejectedWith(EVM_REVERT)
+
+        // Attempt to transfer tokens, when there is no amount
+        invalidAmount = tokens(10) // recipient does not have tokens
+        await token.transfer(deployer, invalidAmount, { from: receiver}).should.be.rejectedWith(EVM_REVERT)
+      })
+      it('rejects invalid recipients', async () => {
+        await token.transfer(0x0, amount, {from: deployer}).should.be.rejected
+      })
+      })      
   })
+
 })
 
