@@ -56,5 +56,15 @@ contract('Token', ([deployer, receiver]) => {
       balanceOf = await token.balanceOf(receiver)
       balanceOf.toString().should.equal(tokens(100).toString())
     })
+    it('emits a transfer event', async() => {
+      // console.log("R E S U L T: ", result.logs)
+      const log = result.logs[0]
+      log.event.should.eq('Transfer')
+      const event = log.args
+      event.from.toString().should.equal(deployer, 'FROM is correct')
+      event.to.should.equal(receiver, 'TO is correct')
+      event.value.toString().should.equal(amount.toString(), 'VALUE is correct')
+    })    
   })
 })
+
